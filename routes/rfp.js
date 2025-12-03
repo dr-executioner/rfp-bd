@@ -1,8 +1,14 @@
-let express = require("express")
-let router = express.Router()
+const express = require('express');
+const router = express.Router();
+const rfpsController = require('../controllers/rfpservice');
 
-router.get("/health", (req, res) => {
-	res.json({status: "ok"})
-})
+//const auth = require('../middleware/auth');
 
-module.exports = router
+// Routes
+router.get('/',  rfpsController.listRFPs);
+router.post('/', rfpsController.createRFP);
+router.get('/:id', rfpsController.getRFP);
+router.patch('/:id', rfpsController.updateRFP);
+
+module.exports = router;
+
