@@ -2,13 +2,12 @@ const express = require('express');
 const router = express.Router();
 const rfpsController = require('../controllers/rfpservice');
 
-//const auth = require('../middleware/auth');
+const auth = require('../middleware/auth');
 
-// Routes
-router.get('/',  rfpsController.listRFPs);
-router.post('/', rfpsController.createRFP);
-router.get('/:id', rfpsController.getRFP);
-router.patch('/:id', rfpsController.updateRFP);
+router.get('/rfp', auth, rfpsController.listRFPs);
+router.post('/create_rfp', auth, rfpsController.createRFP);
+router.get('/rfp/:id', auth, rfpsController.getRFP);
+router.patch('/rfp_update/:id', auth, rfpsController.updateRFP);
 
 module.exports = router;
 

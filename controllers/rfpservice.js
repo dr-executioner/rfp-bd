@@ -3,12 +3,13 @@ const { supabase } = require('../supabase/supabaseClient');
 // GET /rfps - List RFPs
 exports.listRFPs = async (req, res) => {
   try {
-    const { user_id } = req.user; // From auth middleware
-    
+    const {id } = req.user; 
+   
+	console.log("Id inside list rfp service", id)
     const { data, error } = await supabase
       .from('rfps')
       .select('*')
-      .eq('user_id', user_id)
+      .eq('user_id', id)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
