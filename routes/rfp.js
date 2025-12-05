@@ -8,6 +8,7 @@ router.get('/rfp', auth, rfpsController.listRFPs);
 router.post('/create_rfp', auth, rfpsController.createRFP);
 router.get('/rfp/:id', auth, rfpsController.getRFP);
 router.patch('/rfp_update/:id', auth, rfpsController.updateRFP);
+router.post('/generate-ai',auth, rfpsController.generateRFPWithAI);
 
 module.exports = router;
 

@@ -1,15 +1,62 @@
 const { supabase } = require('../supabase/supabaseClient'); 
 
+
+const { parseNaturalLanguageToRFP } = require('../services/gemini');
+
+// POST /api/v1/rfps/generate-ai
+exports.generateRFPWithAI = async (req, res) => {
+  try {
+		console.log(req.user)
+    const { user_id: authUserId } = req.user;
+    const { natural_language } = req.body;
+
+    if (!natural_language) {
+      return res.status(400).json({
+        success: false,
+        error: 'natural_language is required'
+      });
+    }
+
+    console.log('🤖 Generating RFP from:', natural_language);
+
+    const structuredRFP = await parseNaturalLanguageToRFP(natural_language);
+
+    // Save to database
+    const rfpData = {
+      ...structuredRFP,
+      user_id: authUserId,
+      status: 'draft'
+    };
+
+    const { data, error } = await supabase
+      .from('rfps')
+      .insert([rfpData])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.status(201).json({
+      success: true,
+      data,
+      message: 'RFP generated with AI and saved!'
+    });
+  } catch (error) {
+    console.error('AI RFP error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+
 // GET /rfps - List RFPs
 exports.listRFPs = async (req, res) => {
   try {
-    const {id } = req.user; 
+    const {user_id} = req.user; 
    
-	console.log("Id inside list rfp service", id)
     const { data, error } = await supabase
       .from('rfps')
       .select('*')
-      .eq('user_id', id)
+      .eq('user_id', user_id)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -31,7 +78,7 @@ exports.createRFP = async (req, res) => {
     const { user_id } = req.user;
     const rfpData = {
       ...req.body,
-      user_id // Auto-set from auth
+      user_id
     };
 
     // Basic validation
