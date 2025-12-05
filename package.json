@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@sendgrid/mail": "^8.1.6",
     "@supabase/supabase-js": "^2.86.0",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/sendgrid": "^2.0.31",
     "nodemon": "^3.1.11"
   }
 }

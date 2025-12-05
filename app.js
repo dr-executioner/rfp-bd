@@ -28,6 +28,7 @@ app.use(cors({
 //routes
 app.use('/api/v1', rfpRouter);
 app.use('/api/v1', require('./routes/vendor'));
+app.use('/api/v1', require('./routes/RfpVendorsRoutes'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
