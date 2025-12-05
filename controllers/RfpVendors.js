@@ -2,7 +2,7 @@ const { supabase } = require("../supabase/supabaseClient");
 
 exports.linkVendorsToRFP = async (req, res) => {
   try {
-    const { id: userId } = req.user;
+    const { user_id:userId } = req.user;
     const { rfp_id, vendor_ids } = req.body; 
 
     const { data: rfp } = await supabase
@@ -69,8 +69,6 @@ exports.getVendorsForRFP = async (req, res) => {
       .eq('rfp_id', rfp_id);
 	*/
 
-		console.log('🔍 DEBUG - RFP ID:', rfp_id);
-    console.log('🔍 DEBUG - User ID:', user_id);
 
     // Check if RFP exists for user
     const { data: rfpCheck } = await supabase
@@ -79,7 +77,6 @@ exports.getVendorsForRFP = async (req, res) => {
       .eq('id', rfp_id)
       .eq('user_id', user_id);
     
-    console.log('🔍 RFP exists?', rfpCheck);
 
     // Simplified query first
     const { data, error } = await supabase
@@ -87,10 +84,7 @@ exports.getVendorsForRFP = async (req, res) => {
       .select('*, vendors(name, email)')
       .eq('rfp_id', rfp_id);
 
-    console.log('🔍 Raw rfp_vendors data:', data);
-    console.log('🔍 Error:', error);
     if (error) throw error;
-	console.log(data)
     res.json({
       success: true,
       data: data || []

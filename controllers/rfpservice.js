@@ -2,6 +2,7 @@ const { supabase } = require('../supabase/supabaseClient');
 
 
 const { parseNaturalLanguageToRFP } = require('../services/gemini');
+const { sendRFPToVendor } = require('../services/sendgrid');
 
 // POST /api/v1/rfps/generate-ai
 exports.generateRFPWithAI = async (req, res) => {
@@ -16,8 +17,6 @@ exports.generateRFPWithAI = async (req, res) => {
         error: 'natural_language is required'
       });
     }
-
-    console.log('🤖 Generating RFP from:', natural_language);
 
     const structuredRFP = await parseNaturalLanguageToRFP(natural_language);
 
@@ -159,4 +158,57 @@ exports.updateRFP = async (req, res) => {
 };
 
 module.exports = exports;
+
+
+exports.sendRFP = async (req, res) => {
+  try {
+		console.log(req.user)
+		console.log(req.params)
+    const {  user_id:userId } = req.user;
+    const { rfp_id } = req.params;
+
+
+    // Get RFP + linked vendors
+    const { data: rfpVendors } = await supabase
+      .from('rfp_vendors')
+      .select(`
+        *,
+        rfps!rfp_vendors_rfp_id_fkey (*),
+        vendors (*)
+      `)
+      .eq('rfp_id', rfp_id)
+      .eq('rfps.user_id', userId);
+
+    if (!rfpVendors || rfpVendors.length === 0) {
+      return res.status(400).json({ error: 'No vendors linked to this RFP' });
+    }
+
+    // Send emails
+    const results = [];
+    for (const rv of rfpVendors) {
+      const result = await sendRFPToVendor(rv.rfps, rv.vendors);
+      results.push({ vendor: rv.vendors.email, success: true });
+      
+      // Update sent_at
+      await supabase
+        .from('rfp_vendors')
+        .update({ sent_at: new Date().toISOString() })
+        .eq('id', rv.id);
+    }
+
+    // Update RFP status
+    await supabase
+      .from('rfps')
+      .update({ status: 'sent' })
+      .eq('id', rfp_id);
+
+    res.json({
+      success: true,
+      sent: results.length,
+      details: results
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
