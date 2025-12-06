@@ -20,26 +20,12 @@ exports.generateRFPWithAI = async (req, res) => {
 
     const structuredRFP = await parseNaturalLanguageToRFP(natural_language);
 
-    // Save to database
-    const rfpData = {
-      ...structuredRFP,
-      user_id: authUserId,
-      status: 'draft'
-    };
-
-    const { data, error } = await supabase
-      .from('rfps')
-      .insert([rfpData])
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    res.status(201).json({
-      success: true,
-      data,
-      message: 'RFP generated with AI and saved!'
-    });
+		
+		res.status(201).json({
+			success: true,
+			data: structuredRFP,
+		message: "generated rfp from NLP"
+		})
   } catch (error) {
     console.error('AI RFP error:', error);
     res.status(500).json({ success: false, error: error.message });
