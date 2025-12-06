@@ -5,6 +5,8 @@ exports.linkVendorsToRFP = async (req, res) => {
     const { user_id:userId } = req.user;
     const { rfp_id, vendor_ids } = req.body; 
 
+		console.log("Rfp Id:", rfp_id)
+		console.log("Vendor id :", vendor_ids)
     const { data: rfp } = await supabase
       .from('rfps')
       .select('id')
@@ -47,7 +49,54 @@ exports.linkVendorsToRFP = async (req, res) => {
   }
 };
 
-// GET /api/v1/rfps/:id/vendors - Get vendors for specific RFP
+exports.unlinkVendorFromRfp = async (req, res) => {
+  try {
+    console.log("Rfp Vendor Id:", req.params.rfpVendorId);
+    console.log("User id:", req.user.user_id);
+    
+    const { user_id: userId } = req.user;
+    const { rfpVendorId } = req.params;
+
+    const { data: rfpVendor, error: fetchError } = await supabase
+      .from('rfp_vendors')
+      .select(`
+        id,
+        rfps!rfp_vendors_rfp_id_fkey (
+          id,
+          user_id
+        )
+      `)
+      .eq('id', rfpVendorId)
+      .single();
+
+    console.log("rfpVendor FULL:", rfpVendor);
+
+    if (!rfpVendor) {
+      return res.status(404).json({ 
+        error: 'RFP-Vendor link not found', 
+        rfpVendorId 
+      });
+    }
+
+    if (rfpVendor.rfps.user_id !== userId) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    const { error } = await supabase
+      .from('rfp_vendors')
+      .delete()
+      .eq('id', rfpVendorId);
+
+    if (error) throw error;
+
+    res.json({ success: true, unlinked: rfpVendorId });
+  } catch (error) {
+    console.error('Unlink error:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
 exports.getVendorsForRFP = async (req, res) => {
   try {
     const {  user_id } = req.user;

@@ -7,6 +7,7 @@ router.use(auth);
 
 router.post('/rfp_vendors', rfpVendorsController.linkVendorsToRFP);
 router.get('/rfp_vendors/:rfp_id/vendors', rfpVendorsController.getVendorsForRFP);
+router.delete('/rfp_vendors/:rfpVendorId', rfpVendorsController.unlinkVendorFromRfp);
 
 module.exports = router;
 
