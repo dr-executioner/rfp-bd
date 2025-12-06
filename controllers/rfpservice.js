@@ -148,13 +148,11 @@ module.exports = exports;
 
 exports.sendRFP = async (req, res) => {
   try {
-		console.log(req.user)
-		console.log(req.params)
-    const {  user_id:userId } = req.user;
-    const { rfp_id } = req.params;
 
 
-    // Get RFP + linked vendors
+	const {  user_id:userId } = req.user;
+    const { id:rfp_id } = req.params;
+	
     const { data: rfpVendors } = await supabase
       .from('rfp_vendors')
       .select(`
@@ -169,20 +167,19 @@ exports.sendRFP = async (req, res) => {
       return res.status(400).json({ error: 'No vendors linked to this RFP' });
     }
 
-    // Send emails
     const results = [];
     for (const rv of rfpVendors) {
       const result = await sendRFPToVendor(rv.rfps, rv.vendors);
-      results.push({ vendor: rv.vendors.email, success: true });
+	  console.log("sendRFPToVendor Result:", result)		
+	const messageId = result[0].headers['x-message-id'];		
+      results.push({ vendor: rv.vendors.email, success: true, messageId, queuedAt : new Data().toISOString() });
       
-      // Update sent_at
       await supabase
         .from('rfp_vendors')
         .update({ sent_at: new Date().toISOString() })
         .eq('id', rv.id);
     }
 
-    // Update RFP status
     await supabase
       .from('rfps')
       .update({ status: 'sent' })
