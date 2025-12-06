@@ -10,6 +10,8 @@ router.get('/rfp/:id', auth, rfpsController.getRFP);
 router.patch('/rfp_update/:id', auth, rfpsController.updateRFP);
 router.post('/rfps/generate',auth, rfpsController.generateRFPWithAI);
 router.post('/rfps/:id/send',auth, rfpsController.sendRFP);  
+router.delete('/rfps/:id', auth, rfpsController.deleteRFP);
+
 
 module.exports = router;
 

@@ -32,8 +32,40 @@ exports.generateRFPWithAI = async (req, res) => {
   }
 };
 
+exports.deleteRFP = async (req, res) => {
+  try {
+    const { user_id: userId } = req.user;
+    const { id: rfpId } = req.params;
 
-// GET /rfps - List RFPs
+    const { data: rfp } = await supabase
+      .from('rfps')
+      .select('id')
+      .eq('id', rfpId)
+      .eq('user_id', userId)
+      .single();
+
+    if (!rfp) {
+      return res.status(404).json({ error: 'RFP not found' });
+    }
+
+    const { error } = await supabase
+      .from('rfps')
+      .delete()
+      .eq('id', rfpId);
+
+    if (error) throw error;
+
+    res.json({ 
+      success: true, 
+      message: 'RFP deleted successfully (with linked vendors/proposals)' 
+    });
+  } catch (error) {
+    console.error('Delete RFP error:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
 exports.listRFPs = async (req, res) => {
   try {
     const {user_id} = req.user; 
@@ -148,8 +180,6 @@ module.exports = exports;
 
 exports.sendRFP = async (req, res) => {
   try {
-
-
 	const {  user_id:userId } = req.user;
     const { id:rfp_id } = req.params;
 	
@@ -172,7 +202,7 @@ exports.sendRFP = async (req, res) => {
       const result = await sendRFPToVendor(rv.rfps, rv.vendors);
 	  console.log("sendRFPToVendor Result:", result)		
 	const messageId = result[0].headers['x-message-id'];		
-      results.push({ vendor: rv.vendors.email, success: true, messageId, queuedAt : new Data().toISOString() });
+      results.push({ vendor: rv.vendors.email, success: true, messageId, queuedAt : new Date().toISOString() });
       
       await supabase
         .from('rfp_vendors')
