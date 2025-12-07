@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const rfpVendorsController = require('../controllers/RfpVendors');
+const rfpVendorsController = require('../controllers/rfp-vendors-controller');
 const auth = require('../middleware/auth');
 
 router.use(auth);

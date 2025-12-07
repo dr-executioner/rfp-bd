@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { processInboundEmail } = require('../services/emailParser');
+const { processInboundEmail } = require('../services/emailParser-service');
 
 router.post('/inbound-email', async (req, res) => {
   try {

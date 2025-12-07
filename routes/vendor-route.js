@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const vendorsController = require('../controllers/vendorservice');
+const vendorsController = require('../controllers/vendor-controller');
 const auth = require('../middleware/auth');
 
 router.use(auth);

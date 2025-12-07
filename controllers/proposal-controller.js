@@ -1,4 +1,4 @@
-const { scoreProposals } = require("../services/proposalScorer");
+const { scoreProposals } = require("../services/proposalScorer-service");
 const { supabase } = require("../supabase/supabaseClient");
 
 exports.getProposalsForRFP = async (req, res) => {

@@ -6,11 +6,8 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var rfpRouter = require('./routes/rfp');
-
 var app = express();
 
-// view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
@@ -19,18 +16,22 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(cors({
-	origin:  "http://localhost:3000",  
+  origin: [
+    "http://localhost:3000",
+    "https://rfp-next-two.vercel.app"
+  ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
 
 //routes
-app.use('/api/v1', rfpRouter);
-app.use('/api/v1', require('./routes/vendor'));
-app.use('/api/v1', require('./routes/RfpVendorsRoutes'));
-app.use('/api/v1', require('./routes/ProposalRoutes'));
-app.use('/api/v1', require('./routes/EmailWebhook'));
+app.use('/api/v1', require('./routes/rfp-route'));
+app.use('/api/v1', require('./routes/vendor-route'));
+app.use('/api/v1', require('./routes/rfp-vendor-routes'));
+app.use('/api/v1', require('./routes/proposal-route'));
+app.use('/api/v1', require('./routes/email-webhook-route'));
 
 
 // catch 404 and forward to error handler

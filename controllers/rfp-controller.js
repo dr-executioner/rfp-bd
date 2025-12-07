@@ -1,8 +1,8 @@
 const { supabase } = require('../supabase/supabaseClient'); 
 
 
-const { parseNaturalLanguageToRFP } = require('../services/gemini');
-const { sendRFPToVendor } = require('../services/sendgrid');
+const { parseNaturalLanguageToRFP } = require('../services/gemini-service');
+const { sendRFPToVendor } = require('../services/sendgrid-service');
 
 // POST /api/v1/rfps/generate-ai
 exports.generateRFPWithAI = async (req, res) => {
